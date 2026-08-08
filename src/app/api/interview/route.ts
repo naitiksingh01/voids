@@ -9,9 +9,10 @@ export async function POST(req: NextRequest) {
 
     if (candidate && message === undefined) {
       const session = startSession(candidate as Candidate, sessionId);
-      const result = processTurn(session.id);
+      const result = await processTurn(session.id);
       return NextResponse.json({
         reply: result.reply,
+        why: result.why,
         done: result.done,
         sessionId: session.id,
         profile: result.profile,
@@ -21,9 +22,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (sessionId && message !== undefined) {
-      const result = processTurn(sessionId, message);
+      const result = await processTurn(sessionId, message);
       return NextResponse.json({
         reply: result.reply,
+        why: result.why,
         done: result.done,
         feedback: result.feedback,
         profile: result.profile,
@@ -34,6 +36,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   } catch (e: any) {
+    console.error(e);
     return NextResponse.json({ error: e.message || "Server error" }, { status: 500 });
   }
 }
